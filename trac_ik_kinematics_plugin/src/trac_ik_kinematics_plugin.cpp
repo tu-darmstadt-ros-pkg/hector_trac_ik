@@ -516,6 +516,8 @@ namespace trac_ik_kinematics_plugin
       bounds.rot.z(FLT_MAX);
     }
 
+    bounds.rot.x(FLT_MAX);
+    
     double epsilon = 1e-5;  //Same as MoveIt's KDL plugin
 
     TRAC_IK::SolveType solvetype;
