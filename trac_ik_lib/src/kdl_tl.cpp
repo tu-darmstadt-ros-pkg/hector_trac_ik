@@ -31,6 +31,7 @@ OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <trac_ik/kdl_tl.hpp>
 #include <boost/date_time.hpp>
 #include <ros/ros.h>
+#include <limits>
 
 namespace KDL
 {
@@ -47,7 +48,9 @@ namespace KDL
     for (uint i=0; i<chain.segments.size(); i++) {
       std::string type = chain.segments[i].getJoint().getTypeName();
       if (type.find("Rot")!=std::string::npos) {
-        if (_q_max(types.size())-_q_min(types.size()) < boost::math::tools::epsilon<double>())
+        if ((_q_max(types.size())==0 && _q_min(types.size())==0) ||
+            (_q_max(types.size())>=std::numeric_limits<float>::max() && 
+             _q_min(types.size())<=-std::numeric_limits<float>::max()))
           types.push_back(KDL::BasicJointType::Continuous);
         else types.push_back(KDL::BasicJointType::RotJoint);
       }
@@ -74,11 +77,10 @@ namespace KDL
            
     double time_left;
 
-
     do {
       fksolver.JntToCart(q_out,f);
-      delta_twist = diff1(p_in, f);
-        
+      delta_twist = diffRelative(p_in, f);
+
       if (std::abs(delta_twist.vel.x()) <= std::abs(bounds.vel.x()))
         delta_twist.vel.x(0);
       
@@ -97,11 +99,11 @@ namespace KDL
       if (std::abs(delta_twist.rot.z()) <= std::abs(bounds.rot.z()))
         delta_twist.rot.z(0);
 
-
       if(Equal(delta_twist,Twist::Zero(),eps))
         return 1;
-        
-      
+
+      delta_twist = diff(f, p_in);
+
       vik_solver.CartToJnt(q_out,delta_twist,delta_q);
       KDL::JntArray q_curr;
       
@@ -153,10 +155,11 @@ namespace KDL
         if (rr) {
           for (unsigned int j=0; j<q_out.data.size(); j++) 
             if (types[j]==KDL::BasicJointType::Continuous)
-              q_curr(j)=fRand(-FLT_MAX,FLT_MAX);
+              q_curr(j)=fRand(q_curr(j)-2*M_PI,q_curr(j)+2*M_PI);
             else
               q_curr(j)=fRand(q_min(j),q_max(j));
         }
+
         // Below would be an optimization to the normal KDL, where when it
         // gets stuck, it returns immediately.  Don't use to compare KDL with
         // random restarts or TRAC-IK to plain KDL.

@@ -34,6 +34,7 @@ OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <boost/make_shared.hpp>
 #include <Eigen/Geometry>
 #include <ros/ros.h>
+#include <limits>
 
 namespace TRAC_IK {
 
@@ -60,7 +61,9 @@ namespace TRAC_IK {
     for (uint i=0; i<chain.segments.size(); i++) {
       std::string type = chain.segments[i].getJoint().getTypeName();
       if (type.find("Rot")!=std::string::npos) {
-        if (_q_max(types.size())-_q_min(types.size()) < boost::math::tools::epsilon<double>())
+        if ((_q_max(types.size())==0 && _q_min(types.size())==0) ||
+            (_q_max(types.size())>=std::numeric_limits<float>::max() && 
+             _q_min(types.size())<=-std::numeric_limits<float>::max()))
           types.push_back(KDL::BasicJointType::Continuous);
         else
           types.push_back(KDL::BasicJointType::RotJoint);
@@ -68,7 +71,7 @@ namespace TRAC_IK {
       else if (type.find("Trans")!=std::string::npos)
         types.push_back(KDL::BasicJointType::TransJoint);
     }
-
+    
     assert(types.size()==lb.size());
 
 
@@ -149,7 +152,7 @@ namespace TRAC_IK {
       
       for (unsigned int j=0; j<seed.data.size(); j++)
         if (types[j]==KDL::BasicJointType::Continuous)
-          seed(j)=fRand(-FLT_MAX, FLT_MAX);
+          seed(j)=fRand(q_init(j)-2*M_PI, q_init(j)+2*M_PI);
         else
           seed(j)=fRand(lb[j], ub[j]);
     }
@@ -221,7 +224,7 @@ namespace TRAC_IK {
       
       for (unsigned int j=0; j<seed.data.size(); j++)
         if (types[j]==KDL::BasicJointType::Continuous)
-          seed(j)=fRand(-FLT_MAX, FLT_MAX);
+          seed(j)=fRand(q_init(j)-2*M_PI, q_init(j)+2*M_PI);
         else
           seed(j)=fRand(lb[j], ub[j]);
     }

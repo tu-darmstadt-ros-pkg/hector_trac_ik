@@ -220,7 +220,9 @@ namespace NLOPT_IK {
     for (uint i=0; i<chain.segments.size(); i++) {
       std::string type = chain.segments[i].getJoint().getTypeName();
       if (type.find("Rot")!=std::string::npos) {
-        if (_q_max(types.size())-_q_min(types.size()) < boost::math::tools::epsilon<double>())
+        if ((_q_max(types.size())==0 && _q_min(types.size())==0) ||
+            (_q_max(types.size())>=std::numeric_limits<float>::max() && 
+             _q_min(types.size())<=-std::numeric_limits<float>::max()))
           types.push_back(KDL::BasicJointType::Continuous);
         else
           types.push_back(KDL::BasicJointType::RotJoint);
@@ -303,7 +305,7 @@ namespace NLOPT_IK {
       return;
     }
 
-    KDL::Twist delta_twist = KDL::diff1(targetPose,currentPose);
+    KDL::Twist delta_twist = KDL::diffRelative(targetPose,currentPose);
 
 
     if (std::abs(delta_twist.vel.x()) <= std::abs(bounds.vel.x()))
@@ -365,7 +367,7 @@ namespace NLOPT_IK {
       return;
     }
 
-    KDL::Twist delta_twist = KDL::diff1(targetPose,currentPose);
+    KDL::Twist delta_twist = KDL::diffRelative(targetPose,currentPose);
 
 
     if (std::abs(delta_twist.vel.x()) <= std::abs(bounds.vel.x()))
@@ -430,7 +432,7 @@ namespace NLOPT_IK {
 
 
 
-    KDL::Twist delta_twist = KDL::diff1(targetPose,currentPose);
+    KDL::Twist delta_twist = KDL::diffRelative(targetPose,currentPose);
 
     if (std::abs(delta_twist.vel.x()) <= std::abs(bounds.vel.x()))
       delta_twist.vel.x(0);
@@ -449,9 +451,6 @@ namespace NLOPT_IK {
       
     if (std::abs(delta_twist.rot.z()) <= std::abs(bounds.rot.z()))
       delta_twist.rot.z(0);
-
-    currentPose = addDelta(targetPose,delta_twist,1);
-
 
     math3d::matrix3x3<double> currentRotationMatrix(currentPose.M.data); 
     math3d::quaternion<double> currentQuaternion = math3d::rot_matrix_to_quaternion<double>(currentRotationMatrix);
@@ -552,7 +551,6 @@ namespace NLOPT_IK {
         
         if (x[i] > ub[i]) 
           x[i] = (ub[i]+lb[i])/2.0;
-        
       }
     }
     

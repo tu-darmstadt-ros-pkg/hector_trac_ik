@@ -38,6 +38,7 @@ OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <kdl/chain.hpp>
 #include <kdl_parser/kdl_parser.hpp>
 #include <trac_ik/trac_ik.hpp>
+#include <limits>
 
 
 namespace trac_ik_kinematics_plugin
@@ -243,8 +244,8 @@ namespace trac_ik_kinematics_plugin
                   {
                     if(joint->safety)
                       {
-                        lower = joint->safety->soft_lower_limit;
-                        upper = joint->safety->soft_upper_limit;
+                        lower = std::max(joint->limits->lower, joint->safety->soft_lower_limit);
+                        upper = std::min(joint->limits->upper, joint->safety->soft_upper_limit);
                       } else {
                       lower = joint->limits->lower;
                       upper = joint->limits->upper;
@@ -264,8 +265,8 @@ namespace trac_ik_kinematics_plugin
                 else
                   {
                     joint_has_limits_vector_.push_back(false);
-                    joint_min_vector_.push_back(-FLT_MAX);
-                    joint_max_vector_.push_back(FLT_MAX);
+                    joint_min_vector_.push_back(-std::numeric_limits<float>::max());
+                    joint_max_vector_.push_back(std::numeric_limits<float>::max());
                   }
               }
           } else
@@ -511,9 +512,9 @@ namespace trac_ik_kinematics_plugin
     KDL::Twist bounds=KDL::Twist::Zero();
     
     if (position_ik_)  {
-      bounds.rot.x(FLT_MAX);
-      bounds.rot.y(FLT_MAX);
-      bounds.rot.z(FLT_MAX);
+      bounds.rot.x(std::numeric_limits<float>::max());
+      bounds.rot.y(std::numeric_limits<float>::max());
+      bounds.rot.z(std::numeric_limits<float>::max());
     }
 
     bounds.rot.x(FLT_MAX);
