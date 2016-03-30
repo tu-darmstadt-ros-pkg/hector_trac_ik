@@ -63,6 +63,7 @@ namespace trac_ik_kinematics_plugin
     KDL::JntArray joint_min, joint_max;
 
     std::string solve_type;
+    std::string free_angle;
 
   public:
 
@@ -205,6 +206,7 @@ namespace trac_ik_kinematics_plugin
     setValues(robot_description, group_name, base_name, tip_name, search_discretization);
 
     ros::NodeHandle node_handle("~");
+    ros::NodeHandle node_handle_kinematic_descr("/robot_description_kinematics");
 
     urdf::Model robot_model;
     std::string xml_string;
@@ -305,17 +307,24 @@ namespace trac_ik_kinematics_plugin
     assert(num_joints_ == chain.getNrOfJoints());
 
     ROS_INFO_NAMED("trac-ik plugin","Looking in private handle: %s for param name: %s",
-                    node_handle.getNamespace().c_str(),
+                    node_handle_kinematic_descr.getNamespace().c_str(),
                     (group_name+"/position_only_ik").c_str());
 
-    node_handle.param(group_name+"/position_only_ik", position_ik_, false);
+    node_handle_kinematic_descr.param(group_name+"/position_only_ik", position_ik_, false);
 
     ROS_INFO_NAMED("trac-ik plugin","Looking in private handle: %s for param name: %s",
-                    node_handle.getNamespace().c_str(),
+                    node_handle_kinematic_descr.getNamespace().c_str(),
                     (group_name+"/solve_type").c_str());
 
-    node_handle.param(group_name+"/solve_type", solve_type, std::string("Speed"));
+    node_handle_kinematic_descr.param(group_name+"/solve_type", solve_type, std::string("Speed"));
     ROS_INFO_NAMED("trac_ik plugin","Using solve type %s",solve_type.c_str());
+
+    ROS_INFO_NAMED("trac-ik plugin","Looking in private handle: %s for param name: %s",
+                    node_handle_kinematic_descr.getNamespace().c_str(),
+                    (group_name+"/free_angle").c_str());
+
+    node_handle_kinematic_descr.param(group_name+"/free_angle", free_angle, std::string(""));
+    ROS_INFO_NAMED("trac_ik plugin","Using free angle(s) in IK solution %s",free_angle.c_str());
 
     active_ = true;
     return true;
@@ -517,7 +526,15 @@ namespace trac_ik_kinematics_plugin
       bounds.rot.z(std::numeric_limits<float>::max());
     }
 
-    bounds.rot.x(FLT_MAX);
+    if (!free_angle.empty())
+    {
+        if (free_angle.find("X") != std::string::npos)
+            bounds.rot.x(FLT_MAX);
+        if (free_angle.find("Y") != std::string::npos)
+            bounds.rot.y(FLT_MAX);
+        if (free_angle.find("Z") != std::string::npos)
+            bounds.rot.z(FLT_MAX);
+    }
     
     double epsilon = 1e-5;  //Same as MoveIt's KDL plugin
 
