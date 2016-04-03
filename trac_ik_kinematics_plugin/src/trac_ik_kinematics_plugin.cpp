@@ -519,8 +519,20 @@ namespace trac_ik_kinematics_plugin
         in(z)=ik_seed_state[z];
 
     KDL::Twist bounds=KDL::Twist::Zero();
+
+    if (options.return_approximate_solution)
+    {
+        bounds.vel.x(5e-2);
+        bounds.vel.y(5e-2);
+        bounds.vel.z(5e-2);
+
+        bounds.rot.x(5e-2);
+        bounds.rot.y(5e-2);
+        bounds.rot.z(5e-2);
+    }
     
-    if (position_ik_)  {
+    if (position_ik_)
+    {
       bounds.rot.x(std::numeric_limits<float>::max());
       bounds.rot.y(std::numeric_limits<float>::max());
       bounds.rot.z(std::numeric_limits<float>::max());
