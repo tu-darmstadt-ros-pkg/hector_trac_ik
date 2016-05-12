@@ -522,13 +522,15 @@ namespace trac_ik_kinematics_plugin
 
     if (options.return_approximate_solution)
     {
-        bounds.vel.x(5e-2);
-        bounds.vel.y(5e-2);
-        bounds.vel.z(5e-2);
+        // 5mm for translation
+        bounds.vel.x(5e-3);
+        bounds.vel.y(5e-3);
+        bounds.vel.z(5e-3);
 
-        bounds.rot.x(5e-2);
-        bounds.rot.y(5e-2);
-        bounds.rot.z(5e-2);
+        // ~0.5 Degree for rotation
+        bounds.rot.x(1e-2);
+        bounds.rot.y(1e-2);
+        bounds.rot.z(1e-2);
     }
     
     if (position_ik_)
