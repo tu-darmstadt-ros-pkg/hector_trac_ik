@@ -298,7 +298,7 @@ namespace NLOPT_IK {
     if (rc < 0)
       ROS_FATAL_STREAM("KDL FKSolver is failing: "<<q.data);
 
-    if (isnan(currentPose.p.x())) {
+    if (std::isnan(currentPose.p.x())) {
       ROS_ERROR("NaNs from NLOpt!!");
       error[0] = std::numeric_limits<float>::max();
       progress = -1;
@@ -360,7 +360,7 @@ namespace NLOPT_IK {
       ROS_FATAL_STREAM("KDL FKSolver is failing: "<<q.data);
 
 
-    if (isnan(currentPose.p.x())) {
+    if (std::isnan(currentPose.p.x())) {
       ROS_ERROR("NaNs from NLOpt!!");
       error[0] = std::numeric_limits<float>::max();
       progress = -1;
@@ -423,7 +423,7 @@ namespace NLOPT_IK {
       ROS_FATAL_STREAM("KDL FKSolver is failing: "<<q.data);
 
 
-    if (isnan(currentPose.p.x())) {
+    if (std::isnan(currentPose.p.x())) {
       ROS_ERROR("NaNs from NLOpt!!");
       error[0] = std::numeric_limits<float>::max();
       progress = -1;
