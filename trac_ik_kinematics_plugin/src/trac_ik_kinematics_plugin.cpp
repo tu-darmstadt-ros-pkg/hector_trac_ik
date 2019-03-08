@@ -227,12 +227,12 @@ namespace trac_ik_kinematics_plugin
 
     ROS_DEBUG_STREAM_NAMED("trac_ik","Reading joints and links from URDF");
 
-    boost::shared_ptr<urdf::Link> link = boost::const_pointer_cast<urdf::Link>(robot_model.getLink(getTipFrame()));
+    std::shared_ptr<const urdf::Link> link = robot_model.getLink(getTipFrame());
     while(link->name != base_frame_)
       {
         ROS_DEBUG_NAMED("trac_ik","Link %s",link->name.c_str());
         link_names_.push_back(link->name);
-        boost::shared_ptr<urdf::Joint> joint = link->parent_joint;
+        std::shared_ptr<urdf::Joint> joint = link->parent_joint;
         if(joint)
           {
             if (joint->type != urdf::Joint::UNKNOWN && joint->type != urdf::Joint::FIXED)
