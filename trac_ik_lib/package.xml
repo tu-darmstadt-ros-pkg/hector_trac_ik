@@ -23,6 +23,7 @@
   <build_depend>eigen</build_depend>
   <build_depend>kdl_parser</build_depend>
   <build_depend>libnlopt-dev</build_depend>
+  <build_depend>libnlopt-cxx-dev</build_depend>
   <build_depend>pkg-config</build_depend>
   <build_depend>roscpp</build_depend>
   <build_depend>urdf</build_depend>
@@ -31,6 +32,7 @@
   <run_depend>kdl_parser</run_depend>
   <run_depend>libnlopt-dev</run_depend>
   <run_depend>libnlopt0</run_depend>
+  <run_depend>libnlopt-cxx-dev</run_depend>
   <run_depend>roscpp</run_depend>
   <run_depend>urdf</run_depend>
 </package>
