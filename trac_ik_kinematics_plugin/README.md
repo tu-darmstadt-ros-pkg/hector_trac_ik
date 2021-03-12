@@ -16,6 +16,7 @@ To use:
     - _solve\_type_ can be Speed, Distance, Manipulation1, Manipulation2 (see trac\_ik\_lib documentation for details).  Default is Speed.
     - _kinematics\_solver\_attempts_ parameter is unneeded: unlike KDL, TRAC-IK solver already restarts when it gets stuck
     - _kinematics\_solver\_search\_resolution_ is not applicable here.
+    - _free\_angle_ can be X, Y or Z or any combination (e.g., XZ)[Case Sensitive]. Declares an angle of the endeffector coordinate system to be free. 
     - Note: The Cartesian error distance used to determine a valid solution is _1e-5_, as that is what is hard-coded into MoveIt's KDL plugin.
 
 
